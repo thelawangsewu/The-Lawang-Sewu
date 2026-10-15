@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Lawang Sewu — Game Horror Roblox</title>
+<meta name="description" content="Game horror Roblox bertema Lawang Sewu. Kenali chapter, item, dan cara bermain.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Karla:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="grain"></div><div class="vignette"></div><div class="glow" id="glow"></div><div class="whisper" id="whisper" aria-hidden="true"></div><div class="flash" id="flash"></div>
+<div class="progress" id="progress"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#beranda" id="brandName"></a>
+  <button class="burger" id="burger" aria-label="Buka menu" aria-expanded="false"><span></span><span></span></button>
+  <nav id="menu">
+    <a href="#tentang">Tentang</a>
+    <a href="#chapter">Chapter</a>
+    <a href="#arsip">Arsip</a>
+    <a href="#item">Item</a>
+    <a href="#cara-main">Cara Main</a>
+    <a href="#kredit">Kredit</a>
+    <a class="btn small" id="navPlay" href="#" target="_blank" rel="noopener">Main</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" id="beranda">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="fog"></div>
+    <div class="hero-dark" id="heroDark"></div>
+    <canvas id="dust" aria-hidden="true"></canvas>
+    <div class="eyes" id="eyes" aria-hidden="true"></div>
+    <div class="hero-content">
+      <h1 id="heroTitle"></h1>
+      <p class="tagline" id="heroTagline"></p>
+      <div class="actions">
+        <a class="btn" id="btnPlay" href="#" target="_blank" rel="noopener">Main di Roblox</a>
+        <a class="btn ghost" id="btnDiscord" href="#" target="_blank" rel="noopener">Gabung Discord</a>
+      </div>
+    </div>
+    <p class="hint">Gerakkan kursor untuk menyalakan senter. Disarankan memakai headphone.</p>
+  </section>
+
+  <section id="tentang">
+    <div class="wrap narrow">
+      <h2>Tentang Game</h2>
+      <div id="aboutText"></div>
+    </div>
+  </section>
+
+  <section id="chapter" class="alt">
+    <div class="wrap">
+      <h2>Chapter</h2>
+      <div class="chapters">
+        <div class="tabs" id="chTabs" role="tablist"></div>
+        <article class="panel" id="chPanel" aria-live="polite"></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="arsip" class="arsip">
+    <div class="wrap narrow">
+      <h2>Arsip Berkas</h2>
+      <p class="sub" id="docIntro"></p>
+      <article class="doc" id="doc"></article>
+      <p class="doc-count" id="docCount"></p>
+      <p class="doc-final" id="docFinal" hidden></p>
+    </div>
+  </section>
+
+  <section id="item">
+    <div class="wrap">
+      <h2>Item di Lawang Sewu</h2>
+      <p class="sub">Klik item untuk melihat detail.</p>
+      <div class="grid" id="itemGrid"></div>
+    </div>
+  </section>
+
+  <section id="cara-main" class="alt">
+    <div class="wrap two">
+      <div>
+        <h2>Cara Bermain</h2>
+        <ol class="steps" id="steps"></ol>
+      </div>
+      <div>
+        <h2>Kontrol</h2>
+        <dl class="controls" id="controls"></dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="kredit">
+    <div class="wrap">
+      <h2>Kredit</h2>
+      <p class="sub">Klik kartu untuk melihat detail.</p>
+      <div id="credits"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p class="foot-title" id="footTitle"></p>
+  <div class="actions center">
+    <a class="btn" id="footPlay" href="#" target="_blank" rel="noopener">Main di Roblox</a>
+    <a class="btn ghost" id="footDiscord" href="#" target="_blank" rel="noopener">Discord</a>
+  </div>
+  <p class="small-note" id="footNote"></p>
+</footer>
+
+<dialog id="modal" aria-label="Detail"><button class="close" id="modalClose" aria-label="Tutup">&times;</button><div id="modalBody"></div></dialog>
+
+<div class="snd">
+  <button id="btnSfx" aria-pressed="true"><i class="dot"></i>Efek suara</button>
+  <button id="btnAmb" aria-pressed="false"><i class="dot"></i>Ambient</button>
+</div>
+
+<script src="data.js"></script>
+<script src="sound.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
