@@ -1,6 +1,7 @@
 /* Efek suara dibuat lewat WebAudio (tanpa file mp3). Mau pakai audio sendiri? Ganti isi fungsi di bawah. */
 window.Sfx = (function () {
   let ctx, master, drone, lastHover = 0, lastHeart = 0;
+  let cfg = { volume: 0.4, tracks: [] }, fa = null, ti = 0, fails = 0, ducked = false, running = false, fadeT = null;
   const get = (k) => { try { return localStorage.getItem("ls_" + k); } catch (e) { return null; } };
   const set = (k, v) => { try { localStorage.setItem("ls_" + k, v); } catch (e) {} };
   let sfxOn = get("sfx") !== "off", ambOn = get("amb") === "on";
@@ -36,7 +37,7 @@ window.Sfx = (function () {
     s.connect(f); f.connect(g); g.connect(master); s.start(t);
   }
 
-  function startAmb() {
+  function startDrone() {
     const c = ac(); if (!c || drone) return;
     const g = c.createGain(); g.gain.setValueAtTime(0.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(0.06, c.currentTime + 3);
     const lp = c.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 220;
@@ -45,13 +46,57 @@ window.Sfx = (function () {
     lp.connect(g); g.connect(master); lfo.start();
     drone = { g, stop() { const t = c.currentTime; g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0.0001, t, 0.4); setTimeout(() => { oscs.forEach((o) => o.stop()); lfo.stop(); }, 1800); } };
   }
-  function stopAmb() { if (drone) { drone.stop(); drone = null; } }
+  function stopDrone() { if (drone) { drone.stop(); drone = null; } }
+
+  /* Ambient dari file (diatur di data.js > ambient) */
+  const fileVol = () => cfg.volume * (ducked ? 0.25 : 1);
+  function fadeTo(a, to, ms, done) {
+    clearInterval(fadeT);
+    const from = a.volume, t0 = performance.now();
+    fadeT = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / ms);
+      a.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+      if (k >= 1) { clearInterval(fadeT); done && done(); }
+    }, 40);
+  }
+  function label(t) { if (typeof Sfx !== "undefined" && Sfx.onTrack) Sfx.onTrack(t); }
+  function playTrack() {
+    const list = cfg.tracks; if (!list.length) return startDrone();
+    const tr = list[ti % list.length];
+    const me = fa = new Audio(); me.volume = 0; me.src = tr.src; me.loop = list.length === 1;
+    me.addEventListener("ended", () => { if (fa !== me) return; ti++; stopFile(true); playTrack(); });
+    me.addEventListener("error", () => {
+      if (fa !== me) return;
+      fails++; stopFile(true);
+      if (fails >= list.length) { label(null); if (ambOn) startDrone(); } else { ti++; playTrack(); }
+    });
+    const p = me.play();
+    if (p && p.then) p.then(() => { if (fa !== me) return; fails = 0; label(tr.label || ""); fadeTo(me, fileVol(), 2200); }).catch((e) => { if (e && e.name === "NotAllowedError") { running = false; stopFile(true); } });
+  }
+  function stopFile(now) {
+    if (!fa) return; const a = fa; fa = null;
+    if (now) { a.pause(); a.removeAttribute("src"); return; }
+    clearInterval(fadeT); const from = a.volume, t0 = performance.now();
+    const iv = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / 900); a.volume = from * (1 - k); if (k >= 1) { clearInterval(iv); a.pause(); a.removeAttribute("src"); } }, 40);
+  }
+  function startAmb() {
+    if (running) return; running = true; fails = 0;
+    if (cfg.tracks.length) playTrack(); else startDrone();
+  }
+  function stopAmb() { running = false; stopFile(false); stopDrone(); label(null); }
+  document.addEventListener("visibilitychange", () => {
+    if (!fa) return;
+    if (document.hidden) fa.pause(); else if (ambOn) fa.play().catch(() => {});
+  });
 
   return {
     get sfx() { return sfxOn; }, get amb() { return ambOn; },
     setSfx(v) { sfxOn = v; set("sfx", v ? "on" : "off"); if (v) this.click(); },
     setAmb(v) { ambOn = v; set("amb", v ? "on" : "off"); v ? startAmb() : stopAmb(); },
     resumeAmb() { if (ambOn) startAmb(); },
+    onTrack: null,
+    config(c) { if (c) cfg = { volume: c.volume == null ? 0.4 : c.volume, tracks: (c.tracks || []).filter((x) => x && x.src) }; },
+    duck(v) { ducked = v; if (ctx) master.gain.setTargetAtTime(v ? 0.2 : 0.8, ctx.currentTime, 0.25); if (fa && fa.volume > 0) fadeTo(fa, fileVol(), 500); },
     click() { if (!sfxOn) return; tone({ f: 150, f2: 55, type: "triangle", d: 0.14, v: 0.25 }); noise({ d: 0.06, f: 900, v: 0.08 }); },
     hover() { const n = performance.now(); if (!sfxOn || n - lastHover < 90) return; lastHover = n; tone({ f: 700, f2: 520, d: 0.05, v: 0.03 }); },
     open()  { if (!sfxOn) return; noise({ d: 0.7, f: 150, f2: 1400, type: "bandpass", v: 0.12, a: 0.25 }); tone({ f: 62, d: 0.8, v: 0.12 }); },

@@ -5,6 +5,22 @@
    ========================================================= */
 const SITE = {
   title: "The Lawang Sewu",
+  /* true  = sebelum Chapter 1 rilis, tombol utama diarahkan ke Discord (kabar rilis)
+     false = tombol "Main di Roblox" selalu tampil */
+  gatePlayUntilRelease: true,
+  /* ---------- SUARA AMBIENT (tombol "Ambient") ----------
+     Taruh file mp3 sejajar index.html, lalu daftarkan di tracks.
+     Satu track = diulang terus. Beberapa track = diputar bergantian lalu mengulang.
+     tracks kosong / file belum ada = otomatis pakai dengung bawaan.
+     volume : 0 sampai 1 (rekomendasi 0.3 - 0.5). Otomatis mengecil saat suara aktor diputar. */
+  ambient: {
+    volume: 0.4,
+    tracks: [
+      { label: "Ambient 1", src: "Musik_Krontjong.mp3" }
+      // , { label: "Ambient 2", src: "ambient-2.mp3" }
+    ]
+  },
+
   tagline: "Seribu pintu. Satu jalan keluar.",
   banner: "banner.jpg",
 
@@ -26,6 +42,10 @@ const SITE = {
   chapters: [
     {
       no: 1, status: "live", title: "Lorong Seribu Pintu",
+      /* TANGGAL RILIS (hitung mundur). Format: "TAHUN-BULAN-TANGGALTJAM:MENIT:DETIK+07:00" (WIB).
+         Setelah waktu ini lewat, chapter otomatis terbuka. Hapus baris ini kalau tidak mau hitung mundur. */
+      release: "2026-10-31T00:00:00+07:00",
+      preText: "Rama akan terbangun di tempat yang bukan rumahnya. Pintu pertama terbuka sebentar lagi.",
       images: [
         "chapter1.jpg",
         "chapter2.jpg"
@@ -49,7 +69,8 @@ const SITE = {
     {
       no: 2, status: "soon", title: "Segera Hadir",
       teaser: "banner.jpg",
-      text: "Perjalanan Rama belum berakhir. Chapter berikutnya sedang disiapkan."
+      /* Kalau tanggalnya sudah ada, tambah:  release: "2026-12-01T00:00:00+07:00",  maka otomatis jadi hitung mundur */
+      text: "Perjalanan Rama belum berakhir. Chapter berikutnya sedang disiapkan, tanggal rilis menunggu info resmi."
     }
   ],
 
@@ -75,6 +96,29 @@ const SITE = {
       desc: "Kunci menuju pintu keluar. Kunci terakhir yang paling berharga, jangan sampai hilang." },
     { name: "Medkit",      tag: "Bantuan",  image: "item-madkit.png",     where: "",
       desc: "Tas P3K untuk memulihkan kondisi Rama setelah terluka. Gunakan di saat yang tepat." }
+  ],
+
+  /* ---------- BADGE & TITLE ----------
+     name  : nama badge / title
+     type  : "Badge" atau "Title" (kalau ada 2 jenis, filter muncul otomatis)
+     image : nama file gambar, taruh sejajar dengan index.html (PNG transparan, persegi). Kosongkan = tampil siluet
+     desc  : penjelasan singkat (tampil di kartu dan di jendela detail)
+     how   : opsional, cara mendapatkannya */
+  badgesIntro: "Selesaikan tantangan di dalam gedung untuk mengumpulkan badge dan title. Klik untuk melihat detail.",
+  badges: [
+    { name: "Tamu Lawang Sewu", type: "Biasa", image: "tamu_lawang_sewu.png", desc: "Melangkah masuk ke Lawang Sewu pertama kalinya.", how: "" },
+    { name: "Raja Paku", type: "Juara", image: "raja_paku_black.png", desc: "Pringkat 1 Leaderbord Paku. Gelar hilang kalau posisi kamu tersalip.", how: "" },
+    { name: "Dermawan", type: "Juara", image: "dermawan_black.png", desc: "Peringkat 1 Leaderbord Donasi. Gelar hilang kalau posisi kamu tersalip. ", how: "" },
+    { name: "Pelari Tercepat",  type: "Juara", image: "pelari_tercepat_black.png", desc: "Peringkat 1 Leaderbord Speed Run. Gelar hilang kalau posisi kamu tersalip.", how: "" },
+    { name: "Si Gesit", type: "Biasa", image: "lolos_kejaran.png", desc: "Selamat dari kejaran sosok di Lawang Sewu", how: "" },
+    { name: "Penghuni Lemari", type: "Biasa", image: "penghuni_lemari.png", desc: "Bersembunyi didalam Lemari sebanyak 25 kali", how: "" },
+    { name: "Penyelamat", type: "Biasa", image: "penyelamat.png", desc: "Menyelamatkan teman dari cengkraman iblis sebanyak 5 kali.", how: "" },
+    { name: "Rombongan Lengkap", type: "Biasa", image: "rombongan_lengkap.png", desc: "Menamatkan Chapter One Bersama 4 Pemain.", how: "" },
+    { name: "Mimpi Buruk", type: "Legenda", image: "mimpi_buruk.png", desc: "Menamatkan Chapter One di tingkat kesulitan Hard", how: "" },
+    { name: "Tak Tersentuh", type: "Langka", image: "tak_tersentuh.png", desc: "Menamatkan Chapter One tanpa sekalipun tertangkap", how: "" },
+    { name: "Pemecah Segel", type: "Biasa", image: "pemecah_segel.png", desc: "Menemukan dan membuka pintu keluar yang asli", how: "" },
+    { name: "Pembaca Arsip", type: "Biasa", image: "pembaca_arsip.png", desc: "Membaca berkas penting di ruang direksi", how: "" },
+    { name: "Keluar dari Mimpi", type: "Biasa", image: "keluar_dari_mimpi.png", desc: "Menamatkan Chapter One", how: "" },
   ],
 
   steps: [
@@ -111,7 +155,13 @@ const SITE = {
         bio: "Membantu pengembangan game dan memastikan setiap chapter berjalan lancar." }
     ],
     voice: [
-      { name: "Suripto", role: "VoiceOver - Rama", photo: "team-suripto.jpg",
+      { name: "Suripto", role: "VoiceOver - Rama", character: "Rama", photo: "team-suripto.jpg",
+        /* SUARA: taruh file suara (mp3) di folder yang SAMA dengan index.html, lalu tulis nama filenya.
+           Mau banyak cuplikan? Tambah objek lagi di dalam samples. Tanpa samples = tidak ada pemutar. */
+        samples: [
+          { label: "Suara Rama", src: "rama-1.mp3", quote: "" }
+          // , { label: "Rama saat ketakutan", src: "rama-2.mp3", quote: "Siapa di sana?" }
+        ],
         link: "https://www.roblox.com/id/users/7884958679/profile",
         bio: "Pengisi suara karakter Rama yang menghidupkan cerita dan suasana mencekam di Lawang Sewu." }
     ]
