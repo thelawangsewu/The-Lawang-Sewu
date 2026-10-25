@@ -26,7 +26,7 @@ const SITE = {
 
   links: {
     play:    "https://www.roblox.com/id/games/129140533377074/The-Lawang-Sewu",
-    discord: "https://discord.gg/AprrV63gn",
+    discord: "https://discord.gg/E54fQRBxj",
     group:   "https://www.roblox.com/id/communities/35707507/Sewu-Studio"
   },
 
