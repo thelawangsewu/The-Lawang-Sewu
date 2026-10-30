@@ -709,3 +709,137 @@ button.item{display:flex;flex-direction:column;height:100%}
   .chips::-webkit-scrollbar{display:none}
   .chips button{flex:0 0 auto}
 }
+
+
+/* ---------- Popup sambutan ---------- */
+button.btn{font:600 1rem var(--body);cursor:pointer}
+#welcome{width:min(580px,92vw);border-color:var(--blood);overflow:hidden auto;
+  background:radial-gradient(ellipse at 50% -8%,rgba(94,20,19,.75),transparent 68%),var(--soot);
+  box-shadow:0 0 90px rgba(158,36,32,.35),0 30px 80px rgba(0,0,0,.7)}
+#welcome::backdrop{background:radial-gradient(circle at 50% 40%,rgba(30,8,7,.82),rgba(3,2,2,.95))}
+.w-head{padding:2.4rem 2rem 1.1rem;text-align:center}
+.w-kick{font:600 .72rem var(--body);letter-spacing:.24em;text-transform:uppercase;color:var(--candle)}
+.w-head .w-title{font-size:clamp(2.4rem,8vw,3.4rem);margin:.5rem 0 0;padding:0;border:0;text-shadow:0 0 28px rgba(158,36,32,.5);animation:flicker 5s 1s infinite}
+.w-head .w-title::after{display:none}
+.w-line{display:block;width:72px;height:2px;margin:1rem auto 0;background:var(--blood);box-shadow:0 0 14px var(--blood)}
+.w-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:.45rem;padding:0 1.6rem}
+.w-tabs button{background:transparent;border:1px solid var(--line);color:var(--mute);padding:.4rem .95rem;font:600 .84rem var(--body);cursor:pointer;transition:.2s}
+.w-tabs button:hover{color:var(--bone);border-color:var(--mute)}
+.w-tabs [aria-selected="true"]{background:var(--blood);border-color:var(--blood);color:#fff}
+.w-panel{padding:1.5rem 2rem 0;min-height:12.5rem}
+.w-swap{animation:wIn .18s ease-out}
+.w-panel h3{font-size:1.9rem;margin-bottom:.6rem;color:var(--bone)}
+.w-panel p{color:#cfc6b3;font-size:1rem;line-height:1.65}
+.w-panel p+p{margin-top:.7rem}
+.w-panel .w-rel{color:var(--candle);font-size:.92rem}
+.w-panel .actions{margin-top:1.2rem;gap:.7rem}
+.w-panel .btn{padding:.6rem 1.2rem;font-size:.92rem}
+.w-foot{margin-top:1.5rem;padding:1.3rem 2rem 1.7rem;border-top:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:.9rem}
+.w-enter{width:100%;padding:.95rem 1.5rem;font-size:1.05rem;letter-spacing:.02em}
+.w-enter:hover{box-shadow:0 0 28px rgba(158,36,32,.6)}
+.w-note{font-size:.78rem;color:var(--mute);text-align:center;line-height:1.5}
+#welcome.again .w-note{display:none}
+@keyframes wIn{from{opacity:0}to{opacity:1}}
+@media(max-width:560px){
+  .w-head{padding:2rem 1.2rem .9rem}
+  .w-panel{padding:1.3rem 1.3rem 0;min-height:13.5rem}
+  .w-foot{padding:1.2rem 1.3rem 1.5rem}
+  .w-tabs{padding:0 1rem}
+}
+@media(prefers-reduced-motion:reduce){.w-swap,.w-head .w-title{animation:none}}
+@media(max-width:700px){#welcome{width:100%;max-width:100%}.w-head .w-title{font-size:2.3rem}}
+
+/* Popup: ringan dan responsif (animasi latar dijeda selama popup tampil) */
+#welcome[open]{animation:wPop .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes wPop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+#welcome button,#welcome a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#welcome .btn,#welcome .w-tabs button{transition:background .12s,border-color .12s,color .12s,transform .08s}
+#welcome .btn:active,#welcome .w-tabs button:active{transform:scale(.97)}
+html.popup-open .grain,html.popup-open .glow,html.popup-open .fog,html.popup-open .eye i,html.popup-open .hero h1,html.popup-open .hero h1 span,html.popup-open .whisper,html.popup-open .hero-dark{animation-play-state:paused!important}
+html.popup-open .grain,html.popup-open .glow{display:none}
+.w-head .w-title{animation:none}
+@media(max-width:700px){#welcome[open]{animation:sheetIn .28s cubic-bezier(.2,.8,.2,1)}}
+
+
+/* ---------- Layar pembuka (logo bergoyang + Masuk) ---------- */
+html.gate-open{overflow:hidden}
+.gate{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;overflow:hidden auto;text-align:center;
+  padding:0 1.2rem max(1.2rem,env(safe-area-inset-bottom));background:#050303;overscroll-behavior:contain}
+.g-bg{position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 55% at 50% 30%,rgba(94,20,19,.5),transparent 70%),linear-gradient(rgba(5,3,3,.8),rgba(5,3,3,.95)),var(--bg,none) center/cover}
+.g-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 35%,rgba(0,0,0,.75));animation:gBreath 7s ease-in-out infinite alternate}
+.g-sign{position:relative;z-index:1;width:min(350px,84vw);padding-top:max(0px,env(safe-area-inset-top));transform-origin:50% 0;will-change:transform;
+  animation:gFade .9s both,gSwayIn 3.2s cubic-bezier(.3,.1,.3,1) both,gSway 6s ease-in-out 3.2s infinite}
+.g-chain{position:absolute;top:0;width:2px;height:clamp(40px,8vh,72px);
+  background:repeating-linear-gradient(#6b5a45 0 5px,#2a211b 5px 8px)}
+.g-chain.l{left:17%}.g-chain.r{right:17%}
+.g-board{margin-top:clamp(40px,8vh,72px);padding:1.7rem 1.2rem 1.5rem;position:relative;
+  background:linear-gradient(#1a1312,#100b0a);border:1px solid rgba(217,164,91,.4);
+  box-shadow:0 0 0 4px #0b0807,0 0 0 5px rgba(217,164,91,.16),0 26px 60px rgba(0,0,0,.75),0 0 70px rgba(158,36,32,.28)}
+.g-board::before,.g-board::after{content:"";position:absolute;top:-5px;width:9px;height:9px;border-radius:50%;background:#6b5a45;box-shadow:0 0 0 2px #1b1514}
+.g-board::before{left:calc(17% - 4px)}.g-board::after{right:calc(17% - 4px)}
+.g-logo{display:block;width:min(215px,58vw);height:auto;margin:0 auto 1rem;color:var(--candle);filter:drop-shadow(0 0 16px rgba(217,164,91,.22))}
+.g-logo .b path{fill:#0e0908}
+.g-logo .lw path{fill:var(--candle);animation:gWin 4.6s calc(var(--n)*-.83s) infinite}
+.g-logo .lw path:nth-child(3n){animation-duration:7s}
+.g-logo .lw path:nth-child(5n){opacity:.12;animation:none}
+.g-logo .door{fill:var(--blood);filter:drop-shadow(0 0 7px rgba(214,50,40,.95));animation:gDoor 2.8s ease-in-out infinite}
+.g-kick{font:600 .7rem var(--body);letter-spacing:.26em;text-transform:uppercase;color:var(--candle)}
+.g-title{font:700 clamp(2.1rem,9.5vw,3.2rem)/1.05 var(--display);margin:.4rem 0 0;color:var(--bone);text-shadow:0 0 26px rgba(158,36,32,.6);animation:flicker 5s 1.5s infinite}
+.g-line{display:block;width:64px;height:2px;margin:.9rem auto .8rem;background:var(--blood);box-shadow:0 0 14px var(--blood)}
+.g-tag{font:italic 500 1.12rem/1.35 var(--display);color:var(--candle)}
+.g-lower{position:relative;z-index:1;margin:auto 0;padding:1.2rem 0 .4rem;display:flex;flex-direction:column;align-items:center;gap:1.1rem;width:100%;animation:gFade 1s .5s both}
+.g-msg{max-width:34rem}
+.g-msg p{color:#cfc6b3;font-size:1rem;line-height:1.65}
+.g-msg p+p{margin-top:.6rem}
+.g-foot{display:flex;flex-direction:column;align-items:center;gap:.8rem;width:100%}
+.g-enter{min-width:min(290px,86vw);padding:1rem 2rem;font-size:1.1rem;letter-spacing:.05em;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .15s,opacity .3s,transform .08s,box-shadow .3s}
+.g-enter:disabled{opacity:.4;cursor:progress}
+.g-enter:not(:disabled){animation:gBtn 2.2s ease-in-out infinite}
+.g-enter:not(:disabled):hover{box-shadow:0 0 32px rgba(158,36,32,.7)}
+.g-enter:not(:disabled):active{transform:scale(.97)}
+.g-load{position:relative;width:min(220px,60vw);min-height:2rem;transition:opacity .4s}
+.g-load i{position:absolute;top:0;left:0;right:0;height:2px;background:var(--line);overflow:hidden}
+.g-load i::after{content:"";position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,var(--blood),transparent);animation:gLoad 1.1s linear infinite}
+.g-load span{display:block;padding-top:.55rem;font-size:.78rem;color:var(--mute)}
+.gate.ready .g-load{opacity:0;pointer-events:none}
+.g-note{max-width:26rem;font-size:.78rem;line-height:1.5;color:var(--mute)}
+.gate.leave{pointer-events:none;animation:gLeave 1.1s cubic-bezier(.4,0,.2,1) forwards}
+.gate.leave .g-sign{animation:gOut 1s cubic-bezier(.5,0,.8,.4) forwards}
+.gate.leave .g-lower{animation:gFadeOut .5s forwards}
+@keyframes gFade{from{opacity:0}to{opacity:1}}
+@keyframes gFadeOut{to{opacity:0;transform:translateY(10px)}}
+@keyframes gLeave{0%{opacity:1}35%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes gOut{to{transform:translateY(-115%) rotate(3deg)}}
+@keyframes gSwayIn{0%{transform:rotate(-10deg)}18%{transform:rotate(7.5deg)}38%{transform:rotate(-5.2deg)}58%{transform:rotate(3.8deg)}80%{transform:rotate(-2.6deg)}100%{transform:rotate(2.2deg)}}
+@keyframes gSway{0%,100%{transform:rotate(2.2deg)}50%{transform:rotate(-2.2deg)}}
+@keyframes gWin{0%,100%{opacity:.9}42%{opacity:.9}48%{opacity:.25}54%{opacity:.85}}
+@keyframes gDoor{0%,100%{opacity:.95}50%{opacity:.55}}
+@keyframes gBreath{from{opacity:.55}to{opacity:1}}
+@keyframes gBtn{0%,100%{box-shadow:0 0 0 rgba(158,36,32,0)}50%{box-shadow:0 0 26px rgba(158,36,32,.6)}}
+@keyframes gLoad{from{left:-40%}to{left:100%}}
+@media(max-width:560px){
+  .g-board{padding:1.4rem 1rem 1.2rem}
+  .g-tag{font-size:1.02rem}
+  .g-msg p{font-size:.95rem}
+  .g-lower{gap:1.2rem;padding-top:1.2rem}
+}
+@media(max-height:640px){
+  .g-chain{height:34px}.g-board{margin-top:34px;padding-top:1.1rem}
+  .g-logo{width:150px;margin-bottom:.6rem}
+  .g-tag{display:none}
+  .g-lower{gap:.9rem;padding-top:1rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .g-sign,.g-lower,.g-title,.g-bg::after,.g-logo .lw path,.g-logo .door,.g-enter:not(:disabled),.gate.leave .g-sign{animation:none}
+  .gate.leave{animation:gFade .2s reverse forwards}
+}
+
+/* ---------- Pemutar suara: nyaman di layar sentuh ---------- */
+.vox-play,.vox-wave{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+@media(max-width:560px){
+  .vox-row{padding:.8rem .8rem;gap:.15rem .8rem}
+  .vox-play{width:50px;height:50px}
+  .vox-wave{height:44px}
+  .vox-h{font-size:1.1rem!important}
+}

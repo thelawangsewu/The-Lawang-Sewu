@@ -1,7 +1,7 @@
 /* Efek suara dibuat lewat WebAudio (tanpa file mp3). Mau pakai audio sendiri? Ganti isi fungsi di bawah. */
 window.Sfx = (function () {
   let ctx, master, drone, lastHover = 0, lastHeart = 0;
-  let cfg = { volume: 0.4, tracks: [] }, fa = null, ti = 0, fails = 0, ducked = false, running = false, fadeT = null;
+  let cfg = { volume: 0.4, tracks: [] }, blobs = {}, fa = null, ti = 0, fails = 0, ducked = false, running = false, fadeT = null;
   const get = (k) => { try { return localStorage.getItem("ls_" + k); } catch (e) { return null; } };
   const set = (k, v) => { try { localStorage.setItem("ls_" + k, v); } catch (e) {} };
   let sfxOn = get("sfx") !== "off", ambOn = get("amb") === "on";
@@ -63,7 +63,7 @@ window.Sfx = (function () {
   function playTrack() {
     const list = cfg.tracks; if (!list.length) return startDrone();
     const tr = list[ti % list.length];
-    const me = fa = new Audio(); me.volume = 0; me.src = tr.src; me.loop = list.length === 1;
+    const me = fa = new Audio(); me.volume = 0; me.preload = "auto"; me.src = blobs[tr.src] || tr.src; me.loop = list.length === 1;
     me.addEventListener("ended", () => { if (fa !== me) return; ti++; stopFile(true); playTrack(); });
     me.addEventListener("error", () => {
       if (fa !== me) return;
@@ -71,7 +71,14 @@ window.Sfx = (function () {
       if (fails >= list.length) { label(null); if (ambOn) startDrone(); } else { ti++; playTrack(); }
     });
     const p = me.play();
-    if (p && p.then) p.then(() => { if (fa !== me) return; fails = 0; label(tr.label || ""); fadeTo(me, fileVol(), 2200); }).catch((e) => { if (e && e.name === "NotAllowedError") { running = false; stopFile(true); } });
+    if (p && p.then) p.then(() => { if (fa !== me) return; fails = 0; label(tr.label || ""); fadeTo(me, fileVol(), 1400); }).catch((e) => { if (e && e.name === "NotAllowedError") { running = false; stopFile(true); } });
+  }
+  /* Muat file ambient ke memori lebih dulu (dipanggil selagi layar pembuka tampil) supaya saat "Masuk" langsung bunyi. */
+  function preload() {
+    const tr = cfg.tracks[0];
+    if (!tr || blobs[tr.src]) return Promise.resolve();
+    return fetch(tr.src).then((r) => { if (!r.ok) throw 0; return r.blob(); })
+      .then((b) => { blobs[tr.src] = URL.createObjectURL(b); }).catch(() => {});
   }
   function stopFile(now) {
     if (!fa) return; const a = fa; fa = null;
@@ -95,6 +102,7 @@ window.Sfx = (function () {
     setAmb(v) { ambOn = v; set("amb", v ? "on" : "off"); v ? startAmb() : stopAmb(); },
     resumeAmb() { if (ambOn) startAmb(); },
     onTrack: null,
+    preload,
     config(c) { if (c) cfg = { volume: c.volume == null ? 0.4 : c.volume, tracks: (c.tracks || []).filter((x) => x && x.src) }; },
     duck(v) { ducked = v; if (ctx) master.gain.setTargetAtTime(v ? 0.2 : 0.8, ctx.currentTime, 0.25); if (fa && fa.volume > 0) fadeTo(fa, fileVol(), 500); },
     click() { if (!sfxOn) return; tone({ f: 150, f2: 55, type: "triangle", d: 0.14, v: 0.25 }); noise({ d: 0.06, f: 900, v: 0.08 }); },

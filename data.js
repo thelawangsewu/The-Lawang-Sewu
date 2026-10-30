@@ -21,6 +21,64 @@ const SITE = {
     ]
   },
 
+  /* ---------- LAYAR PEMBUKA (klik "Masuk") ----------
+     Muncul saat pengunjung membuka situs: logo bergoyang + pesan pembuka + tombol Masuk.
+     Saat tombol Masuk diklik, musik ambient langsung menyala (browser butuh satu klik dulu, jadi ini pemicunya).
+     Selagi layar pembuka tampil, file musik dan suara aktor sudah dimuat di belakang layar.
+     enabled         : false = layar pembuka dimatikan
+     cooldownMinutes : 0 = muncul di setiap kunjungan. Isi angka (menit) kalau mau tidak muncul lagi setelah masuk
+     Tes: index.html?gate=on (paksa tampil) atau ?gate=off (sembunyikan) */
+  gate: {
+    enabled: true,
+    cooldownMinutes: 0,
+    kicker: "Situs resmi",
+    title: "The Lawang Sewu",
+    tagline: "Seribu pintu. Tidak semuanya mengizinkanmu keluar.",
+    message: [
+      "Ini game horror Roblox dengan suasana mencekam, suara mendadak, dan jumpscare.",
+      "Pakai headphone di tempat yang nyaman. Ini situs resmi The Lawang Sewu, dan game-nya dimainkan di Roblox."
+    ],
+    loadingText: "Menyiapkan suara…",
+    enterText: "Masuk",
+    note: "Musik ambient menyala saat kamu masuk. Bisa dimatikan lewat tombol Ambient di pojok kanan bawah."
+  },
+
+  /* ---------- INFO & LAPOR BUG ----------
+     Dibuka lewat menu "Lainnya > Info & Lapor Bug" (tidak muncul otomatis).
+     enabled : false = menu Info disembunyikan
+     tabs    : tiap tab punya title, text (daftar paragraf), actions (tombol, opsional)
+               actions.link: "play" | "discord" | "group" (ambil dari links di bawah) atau alamat URL lengkap
+               showRelease: true = tampilkan tanggal rilis Chapter 1 (otomatis hilang kalau sudah rilis) */
+  welcome: {
+    enabled: true,
+    kicker: "Situs resmi",
+    title: "Info situs",
+    tabs: [
+      { label: "Tentang Web", title: "Tentang situs ini",
+        text: [
+          "Situs ini dibuat untuk mengenalkan The Lawang Sewu: chapter, item, badge, cara bermain, dan orang-orang di balik game-nya.",
+          "Ini situs resmi The Lawang Sewu, dibuat oleh tim pengembang game-nya."
+        ] },
+      { label: "Game Roblox", title: "Ini game Roblox",
+        text: [
+          "The Lawang Sewu adalah game horror yang dimainkan di Roblox, bukan di situs ini. Kamu butuh akun Roblox (gratis) untuk memainkannya.",
+          "Game bisa dimainkan bersama teman, sampai 4 pemain."
+        ],
+        showRelease: true,
+        actions: [ { text: "Halaman game", link: "play" }, { text: "Gabung Discord", link: "discord", ghost: true } ] },
+      { label: "Lapor Bug", title: "Menemukan bug?",
+        text: [
+          "Kalau ada bug di game atau error di situs ini, laporkan lewat Discord. Ceritakan apa yang terjadi, di bagian mana, dan perangkat yang kamu pakai. Screenshot atau rekaman layar sangat membantu."
+        ],
+        actions: [ { text: "Lapor di Discord", link: "discord" } ] },
+      { label: "Peringatan", title: "Sebelum masuk",
+        text: [
+          "Ini game horror: ada suasana mencekam, suara mendadak, dan jumpscare. Disarankan memakai headphone di tempat yang nyaman.",
+          "Tidak cocok untuk yang mudah kaget. Kalau terlalu seram, istirahat dulu tidak apa-apa."
+        ] }
+    ]
+  },
+
   tagline: "Seribu pintu. Satu jalan keluar.",
   banner: "banner.jpg",
 
@@ -134,7 +192,8 @@ const SITE = {
     { key: "Shift",   action: "Lari" },
     { key: "E",       action: "Interaksi / buka pintu" },
     { key: "1 – 5",   action: "Pilih item di hotbar" },
-    { key: "C",       action: "Jongkok / sembunyi" }
+    { key: "C",       action: "Jongkok / sembunyi" },
+    { key: "X",       action: "Berdiri" }
   ],
 
   /* ---------- KREDIT (bentuk silsilah) ----------
@@ -163,7 +222,16 @@ const SITE = {
           // , { label: "Rama saat ketakutan", src: "rama-2.mp3", quote: "Siapa di sana?" }
         ],
         link: "https://www.roblox.com/id/users/7884958679/profile",
-        bio: "Pengisi suara karakter Rama yang menghidupkan cerita dan suasana mencekam di Lawang Sewu." }
+        bio: "Pengisi suara karakter Rama yang menghidupkan cerita dan suasana mencekam di Lawang Sewu." },
+      { name: "Anna", role: "VoiceOver - Sekar", character: "Sekar", photo: "team-anna.jpg",
+        /* Anna: upload team-anna.jpg (foto) dan anna-1.mp3 (suara) sejajar dengan index.html.
+           Peran "Sekar" hanya contoh, ganti role dan character sesuai karakter yang diisi Anna. */
+        samples: [
+          { label: "Suara Sekar", src: "anna-1.mp3", quote: "" }
+          // , { label: "Sekar saat ketakutan", src: "anna-2.mp3", quote: "Kak Rama, jangan pergi..." }
+        ],
+        link: "https://www.roblox.com/users/3020592424/profile",
+        bio: "Pengisi suara karakter Sekar yang menambah kehangatan dan ketegangan di dalam cerita Lawang Sewu." }
     ]
   },
 
@@ -187,5 +255,5 @@ const SITE = {
   /* Bisikan acak yang muncul di layar */
   whispers: ["jangan menoleh...", "dia melihatmu", "Rama...", "keluar dari sini", "masih ada yang menunggu di lantai bawah", "kamu mendengarnya juga, kan?", "pintu itu baru saja terbuka"],
 
-  footerNote: "Terinspirasi dari Lawang Sewu, Semarang. Situs penggemar, bukan situs resmi Roblox."
+  footerNote: "Terinspirasi dari Lawang Sewu, Semarang. Situs resmi The Lawang Sewu."
 };

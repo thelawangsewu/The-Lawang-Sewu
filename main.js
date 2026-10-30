@@ -268,8 +268,13 @@
       <p class="vox-note" role="status"></p>
     </div>`).join("")}</div>`;
 
-  const vox = new Audio(); vox.preload = "none";
+  const vox = new Audio(); vox.preload = "auto";
   let voxRow = null;
+  /* Suara dimuat lebih dulu ke memori (blob), jadi saat tombol putar diklik langsung bunyi tanpa menunggu unduhan */
+  const voxU = {}, voxP = {};
+  const voxLoad = (src) => voxP[src] || (voxP[src] = fetch(src).then((r) => { if (!r.ok) throw 0; return r.blob(); })
+    .then((b) => { voxU[src] = URL.createObjectURL(b); }).catch(() => { delete voxP[src]; }));
+  const voxAll = () => C.voice.forEach((p) => (p.samples || []).forEach((s) => voxLoad(s.src)));
   const mmss = (s) => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
   function voxStop() {
     vox.pause();
@@ -289,7 +294,7 @@
     if (row === voxRow && !vox.paused) { vox.pause(); return; }
     if (row !== voxRow) {
       if (voxRow) { voxRow.classList.remove("playing", "loading"); voxRow.style.setProperty("--p", "0%"); }
-      voxRow = row; vox.src = row.dataset.src;
+      voxRow = row; vox.src = voxU[row.dataset.src] || row.dataset.src; voxLoad(row.dataset.src);
     }
     row.classList.remove("err"); row.querySelector(".vox-note").textContent = ""; row.classList.add("loading");
     const pr = vox.play(); if (pr && pr.catch) pr.catch(() => row.classList.remove("loading"));
@@ -315,6 +320,7 @@
     const p = C[b.dataset.g][+b.dataset.i];
     const link = p.link ? `<a class="btn" href="${p.link}" target="_blank" rel="noopener">Lihat profil Roblox</a>` : "";
     openModal(`<div class="m-grid">${photo(p, "photo m-photo")}<div class="m-body"><h3>${p.name}</h3><p class="m-role">${p.role}</p><p>${p.bio || ""}</p>${voxHtml(p)}${link}</div></div>`);
+    (p.samples || []).forEach((s) => voxLoad(s.src));
   });
 
   /* ---------- Arsip berkas (teks disamarkan) ---------- */
@@ -374,6 +380,76 @@
   document.addEventListener("click", (e) => { if (e.target.closest("a, button") && !e.target.closest(".snd, .vox-play")) S.click(); });
   document.addEventListener("pointerover", (e) => { if (e.pointerType === "mouse" && e.target.closest(".btn, .item, .badge, .person, .tabs button, .chips button, .thumb, #menu a")) S.hover(); if (e.target.closest("#btnPlay, #navPlay, #footPlay")) S.heart(); });
 
+  /* ---------- Layar pembuka: logo bergoyang + tombol Masuk (pemicu musik ambient) ----------
+     Browser tidak mengizinkan musik bunyi sebelum ada klik, jadi tombol Masuk jadi pemicunya. */
+  let hold = false;
+  const root = document.documentElement;
+  const holdAnim = (on) => { hold = on; root.classList.toggle("popup-open", on); if (!on && !reduce && typeof loop === "function") loop(); };
+
+  const G = SITE.gate, gate = $("gate"), qg = new URLSearchParams(location.search).get("gate");
+  let lastIn = 0; try { lastIn = +localStorage.getItem("ls_gate_t") || 0; } catch (e) {}
+  const gCool = (G && G.cooldownMinutes ? G.cooldownMinutes : 0) * 60000;
+  const showGate = !!(G && G.enabled !== false && gate && qg !== "off" && (qg === "on" || !gCool || Date.now() - lastIn >= gCool));
+  if (!showGate) { if (gate) gate.remove(); root.classList.remove("gate-open"); }
+  else {
+    $("gKick").textContent = G.kicker || "";
+    $("gTitle").textContent = G.title || SITE.title;
+    $("gTag").textContent = G.tagline || "";
+    $("gMsg").innerHTML = (G.message || []).map((p) => `<p>${p}</p>`).join("");
+    $("gNote").textContent = G.note || "";
+    $("gLoadTxt").textContent = G.loadingText || "Memuat…";
+    const bE = $("gEnter"); bE.textContent = G.enterText || "Masuk";
+    $("gate").style.setProperty("--bg", `url('${SITE.banner}')`);
+    holdAnim(true);
+
+    let ready = false, entered = false;
+    const setReady = () => {
+      if (ready) return; ready = true;
+      bE.disabled = false; gate.classList.add("ready"); $("gLoadTxt").textContent = "";
+      try { bE.focus({ preventScroll: true }); } catch (e) {}
+    };
+    /* Muat musik ambient + suara aktor di belakang layar; tombol aktif begitu musik siap (maks. 3 detik) */
+    const minWait = new Promise((r) => setTimeout(r, reduce ? 0 : 900));
+    const cap = new Promise((r) => setTimeout(r, 3000));
+    Promise.all([minWait, Promise.race([S.preload(), cap])]).then(setReady);
+    setTimeout(voxAll, 400);
+
+    function enter() {
+      if (entered || !ready) return; entered = true;
+      try { localStorage.setItem("ls_gate_t", String(Date.now())); } catch (e) {}
+      S.setAmb(true); bA.setAttribute("aria-pressed", "true");   /* langsung nyala saat klik Masuk */
+      S.open();
+      gate.classList.add("leave"); root.classList.remove("gate-open");
+      holdAnim(false);
+      setTimeout(() => { gate.remove(); }, reduce ? 0 : 1300);
+    }
+    bE.addEventListener("click", enter);
+  }
+
+  /* ---------- Dialog info (Menu: Lainnya > Info & Lapor Bug) ---------- */
+  const WL = SITE.welcome, dlg = $("welcome");
+  if (WL && WL.enabled !== false && dlg && typeof dlg.showModal === "function") {
+    const wTabs = $("wTabs"), wPanel = $("wPanel"), first = SITE.chapters[0];
+    $("wKick").textContent = WL.kicker || "";
+    $("wTitle").textContent = WL.title || "Info situs";
+    wTabs.innerHTML = WL.tabs.map((t, i) => `<button type="button" role="tab" data-i="${i}" aria-selected="${i === 0}">${t.label}</button>`).join("");
+    function wShow(i) {
+      const t = WL.tabs[i];
+      [...wTabs.children].forEach((b, n) => b.setAttribute("aria-selected", n === i));
+      const rel = t.showRelease && first && first._t > Date.now() ? `<p class="w-rel">Chapter ${first.no} terbuka ${longDate(first._t)}.</p>` : "";
+      const acts = (t.actions || []).map((a) => `<a class="btn${a.ghost ? " ghost" : ""}" href="${L[a.link] || a.link}" target="_blank" rel="noopener">${a.text}</a>`).join("");
+      wPanel.innerHTML = `<div class="w-swap"><h3>${t.title}</h3>${(t.text || []).map((p) => `<p>${p}</p>`).join("")}${rel}${acts ? `<div class="actions">${acts}</div>` : ""}</div>`;
+    }
+    wTabs.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { wShow(+b.dataset.i); S.creak(); } });
+    wShow(0);
+    const shut = () => { if (dlg.open) dlg.close(); };
+    $("wEnter").addEventListener("click", shut);
+    $("wClose").addEventListener("click", shut);
+    dlg.addEventListener("click", (e) => { if (e.target === dlg) shut(); });
+    dlg.addEventListener("close", () => holdAnim(false));
+    $("menuInfo").addEventListener("click", (e) => { e.preventDefault(); if (dlg.open) return; wShow(0); holdAnim(true); dlg.showModal(); S.open(); });
+  } else if ($("menuInfo")) $("menuInfo").hidden = true;
+
   /* ---------- Hero: senter, debu, kedip ---------- */
   const hero = $("beranda"), dark = $("heroDark"), cv = $("dust");
   if (!matchMedia("(hover: hover)").matches) document.querySelector(".hint").textContent = "Sentuh dan geser layar untuk menyalakan senter. Disarankan memakai headphone.";
@@ -394,7 +470,7 @@
   size(); addEventListener("resize", size);
   new IntersectionObserver((es) => { vis = es[0].isIntersecting; if (vis) loop(); }).observe(hero);
   function loop() {
-    if (!vis) return;
+    if (!vis || hold) return;
     cx.clearRect(0, 0, W, H);
     if (wander) { const tt = performance.now() / 1000; mx = W * (0.5 + 0.32 * Math.sin(tt * 0.45)); my = H * (0.46 + 0.2 * Math.sin(tt * 0.31 + 1.2)); dark.style.setProperty("--x", mx + "px"); dark.style.setProperty("--y", my + "px"); }
     const lx = mx ?? W / 2, ly = my ?? H * 0.4;

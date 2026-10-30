@@ -11,6 +11,18 @@ Hampir semua isi situs diedit di satu file: **data.js**. Buka dengan Notepad / V
 | `main.js` / `sound.js` | Logika situs dan efek suara (jangan diubah kalau tidak perlu) |
 | `*.jpg` / `*.png` / `*.mp3` | Gambar dan suara, **taruh sejajar dengan index.html** (tanpa folder) |
 
+## 0. Layar pembuka (logo bergoyang + tombol Masuk)
+Saat pengunjung membuka situs, muncul layar pembuka: logo Lawang Sewu yang bergoyang, pesan pembuka, dan tombol **Masuk**. Begitu **Masuk** diklik, **musik ambient langsung menyala** dan layar terangkat. Ini sengaja: browser tidak mengizinkan musik bunyi sebelum ada klik, jadi tombol Masuk jadi pemicunya.
+- Selagi layar pembuka tampil, musik ambient dan suara aktor dimuat di belakang layar (ada bar "Menyiapkan suara…"), jadi saat diklik langsung bunyi.
+- Diedit di `data.js` bagian `gate`: `kicker`, `title`, `tagline`, `message` (daftar paragraf), `enterText`, `loadingText`, `note`.
+- `cooldownMinutes: 0` = muncul di setiap kunjungan. Isi angka (menit) kalau mau tidak muncul lagi setelah masuk.
+- Mau matikan? `enabled: false`.
+- Tes: `index.html?gate=on` (paksa tampil) atau `?gate=off` (sembunyikan).
+- Logo adalah SVG di `index.html` (blok `<svg class="g-logo">`). Mau ganti dengan gambar logo sendiri? Taruh `logo.png` sejajar index.html lalu ganti blok `<svg>` itu dengan `<img class="g-logo" src="logo.png" alt="">`.
+
+## 0b. Info & Lapor Bug
+Dibuka lewat menu **Lainnya > Info & Lapor Bug** (tidak muncul otomatis). Diedit di `data.js` bagian `welcome` (tab: `label`, `title`, `text`, `actions`). `link` pada tombol: `"play"`, `"discord"`, `"group"` atau URL lengkap.
+
 ## 1. Tanggal rilis dan hitung mundur
 Di `data.js`, cari `chapters`. Pada Chapter 1:
 ```js
@@ -33,7 +45,11 @@ samples: [
   { label: "Rama ketakutan", src: "rama-2.mp3", quote: "" }   // cuplikan kedua (opsional)
 ],
 ```
-**Tambah aktor lain:** salin satu blok `{ name: "Suripto", ... }` di dalam `voice: [ ... ]`, beri koma di antaranya, lalu ganti `name`, `role`, `character`, `photo`, `bio`, `samples`. Tanpa `samples`, pemutar tidak muncul.
+**Tambah aktor lain (contoh: Anna):**
+1. Upload `team-anna.jpg` (foto) dan `anna-1.mp3` (suara) sejajar dengan index.html.
+2. Di `data.js`, di dalam `voice: [ ... ]`, salin satu blok `{ name: "Suripto", ... }` dan taruh setelahnya dengan **koma di antaranya**.
+3. Ganti `name`, `role`, `character`, `photo`, `samples`, `link`, `bio`. `link: ""` = tombol profil Roblox tidak muncul. Tanpa `samples`, pemutar tidak muncul.
+- Kartu aktor baru otomatis berjajar rapi di tengah.
 
 ## 2b. Suara Ambient (tombol "Ambient")
 1. Siapkan file mp3 ambient buatanmu (disarankan 1 sampai 3 MB, bisa dibuat looping mulus), misalnya `ambient-1.mp3`.
